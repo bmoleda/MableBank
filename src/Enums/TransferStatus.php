@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TransferStatus
+enum TransferStatus: string
 {
-    case Accepted;
-    case Rejected;
+    case Accepted = 'accepted';
+    case Rejected = 'rejected';
+
+    public function isAccepted(): bool
+    {
+        return $this === self::Accepted;
+    }
 }
