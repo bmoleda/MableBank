@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Dtos\BalanceLoadResult;
 use App\Models\MableAccount;
+use App\Models\Money;
 
 final class AccountBalanceLoader
 {
@@ -13,6 +14,7 @@ final class AccountBalanceLoader
         private readonly CsvFileReader $csvFileReader,
     ) {
     }
+
     public function load(string $path): BalanceLoadResult
     {
         $accounts = [];
@@ -21,13 +23,11 @@ final class AccountBalanceLoader
         foreach ($this->csvFileReader->read($path) as $lineNumber => $row) {
             try {
                 [$accountNumber, $balance] = $this->parseRow($row);
+                $balance = Money::fromDecimalString($balance);
             } catch (\InvalidArgumentException $exception) {
                 $errors[] = sprintf('Row %d: %s', $lineNumber + 1, $exception->getMessage());
                 continue;
             }
-
-            // Convert balance to integer (cents) to avoid floating-point precision issues:
-            $balance = (int) round((float) $balance * 100);
 
             $accounts[$accountNumber] = new MableAccount($accountNumber, $balance);
         }
@@ -37,7 +37,7 @@ final class AccountBalanceLoader
 
     /**
      * @param list<string> $row
-     * @return array{0: string, 1: int}
+     * @return array{0: string, 1: string}
      */
     private function parseRow(array $row): array
     {

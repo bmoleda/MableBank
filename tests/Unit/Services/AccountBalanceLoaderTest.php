@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Services\CsvFileReader;
+use App\Models\Money;
 use App\Services\AccountBalanceLoader;
+use App\Services\CsvFileReader;
 
 describe('load', function (): void {
     it('builds an account for every valid row', function (): void {
@@ -15,15 +16,15 @@ describe('load', function (): void {
             ->and($result->errors)->toBeEmpty();
 
         $expectedBalances = [
-            ['1111234522226789', 500000],
-            ['1111234522221234', 1000000],
-            ['2222123433331212', 55000],
-            ['1212343433335665', 120000],
-            ['3212343433335755', 5000000],
+            ['1111234522226789', '5000.00'],
+            ['1111234522221234', '10000.00'],
+            ['2222123433331212', '550.00'],
+            ['1212343433335665', '1200.00'],
+            ['3212343433335755', '50000.00'],
         ];
 
         foreach ($expectedBalances as [$accountNumber, $expectedBalance]) {
-            expect($result->accounts[$accountNumber]->getBalance())->toBe($expectedBalance);
+            expect($result->accounts[$accountNumber]->getBalance()->equals(Money::fromDecimalString($expectedBalance)))->toBeTrue();
         }
     });
 });
