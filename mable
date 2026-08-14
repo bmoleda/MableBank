@@ -5,5 +5,5 @@ declare(strict_types=1);
 
 require __DIR__.'/vendor/autoload.php';
 
-fwrite(STDERR, "Simple money transfer processor for simple establishments.");
+echo "Simple money transfer processor for simple establishments." . PHP_EOL;
 exit(0);
