@@ -5,9 +5,9 @@ declare(strict_types=1);
 
 require __DIR__.'/vendor/autoload.php';
 
+use App\Helpers\CsvFileReader;
 use App\Models\MableAccount;
 use App\Services\AccountBalanceLoader;
-use App\Services\CsvFileReader;
 use App\Services\TransferProcessor;
 
 if (PHP_VERSION_ID < 80400) {

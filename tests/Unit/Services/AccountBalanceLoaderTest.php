@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Money;
 use App\Services\AccountBalanceLoader;
-use App\Services\CsvFileReader;
+use App\Helpers\CsvFileReader;
 
 describe('load', function (): void {
     it('builds an account for every valid row', function (): void {

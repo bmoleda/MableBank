@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Services\CsvFileReader;
+use App\Helpers\CsvFileReader;
 
 describe('read', function (): void {
     it('yields trimmed rows and skips blank lines', function (): void {
