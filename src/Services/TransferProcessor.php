@@ -80,12 +80,12 @@ final class TransferProcessor
         }
 
         try {
-            $fromAccount->removeFromBalance($amount);
+            $fromAccount->debit($amount);
         } catch (\Exception $exception) {
             return new TransferResult($fromAccountNumber, $toAccountNumber, $amount, TransferStatus::Rejected, $exception->getMessage());
         }
 
-        $toAccount->addToBalance($amount);
+        $toAccount->credit($amount);
 
         return new TransferResult($fromAccountNumber, $toAccountNumber, $amount, TransferStatus::Accepted, null);
     }

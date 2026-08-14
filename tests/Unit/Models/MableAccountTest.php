@@ -35,11 +35,11 @@ describe('getBalance', function (): void {
     });
 });
 
-describe('addToBalance', function (): void {
+describe('credit', function (): void {
     it('increases the balance by the given amount', function (string $initialBalance, string $amountToAdd, string $expectedBalance): void {
         $account = createMableAccount('1111234522226789', $initialBalance);
 
-        $account->addToBalance(Money::fromDecimalString($amountToAdd));
+        $account->credit(Money::fromDecimalString($amountToAdd));
 
         expect($account->getBalance()->equals(Money::fromDecimalString($expectedBalance)))->toBeTrue();
     })->with([
@@ -49,11 +49,11 @@ describe('addToBalance', function (): void {
     ]);
 });
 
-describe('removeFromBalance', function (): void {
+describe('debit', function (): void {
     it('decreases the balance by the given amount', function (string $initialBalance, string $amountToRemove, string $expectedBalance): void {
         $account = createMableAccount('1111234522226789', $initialBalance);
 
-        $account->removeFromBalance(Money::fromDecimalString($amountToRemove));
+        $account->debit(Money::fromDecimalString($amountToRemove));
 
         expect($account->getBalance()->equals(Money::fromDecimalString($expectedBalance)))->toBeTrue();
     })->with([
@@ -71,7 +71,7 @@ describe('removeFromBalance', function (): void {
     it('throws exception if the amount would make it negative', function (): void {
         $account = createMableAccount('1111234522226789', '1.00');
 
-        expect(fn () => $account->removeFromBalance(Money::fromDecimalString('1.50')))
+        expect(fn () => $account->debit(Money::fromDecimalString('1.50')))
             ->toThrow(Exception::class, 'Balance cannot be negative. Current balance: 1.00, attempted to remove: 1.50.');
     });
 });

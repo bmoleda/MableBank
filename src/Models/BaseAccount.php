@@ -17,12 +17,12 @@ abstract class BaseAccount
         return $this->balance;
     }
 
-    public function addToBalance(Money $amount): void
+    public function credit(Money $amount): void
     {
         $this->balance = $this->balance->add($amount);
     }
 
-    public function removeFromBalance(Money $amount): void
+    public function debit(Money $amount): void
     {
         $this->balance = $this->balance->subtract($amount);
     }

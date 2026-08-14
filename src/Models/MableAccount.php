@@ -8,7 +8,7 @@ final class MableAccount extends BaseAccount
 {
     private const string ACCOUNT_NUMBER_PATTERN = '/^\d{16}$/';
 
-    public function removeFromBalance(Money $amount): void
+    public function debit(Money $amount): void
     {
         $newBalance = $this->balance->subtract($amount);
 
