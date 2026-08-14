@@ -6,6 +6,8 @@ namespace App\Models;
 
 final class MableAccount extends BaseAccount
 {
+    private const string ACCOUNT_NUMBER_PATTERN = '/^\d{16}$/';
+
     public function removeFromBalance(Money $amount): void
     {
         $newBalance = $this->balance->subtract($amount);
@@ -15,5 +17,12 @@ final class MableAccount extends BaseAccount
         }
 
         $this->balance = $newBalance;
+    }
+
+    public static function validateAccountNumber(string $accountNumber): void
+    {
+        if (! preg_match(self::ACCOUNT_NUMBER_PATTERN, $accountNumber)) {
+            throw new \InvalidArgumentException("'{$accountNumber}' is not a valid account number.");
+        }
     }
 }

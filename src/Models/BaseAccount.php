@@ -26,4 +26,9 @@ abstract class BaseAccount
     {
         $this->balance = $this->balance->subtract($amount);
     }
+
+    public static function validateAccountNumber(string $accountNumber): void
+    {
+        return;
+    }
 }
