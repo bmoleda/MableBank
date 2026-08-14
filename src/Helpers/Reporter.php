@@ -6,7 +6,6 @@ namespace App\Helpers;
 
 use App\Dtos\BalanceLoadResult;
 use App\Dtos\TransferResult;
-use App\Enums\TransferStatus;
 
 final class Reporter
 {
@@ -31,18 +30,7 @@ final class Reporter
         $rejectedCount = 0;
 
         foreach ($results as $result) {
-            $statusString = strtoupper($result->status?->value);
-            $fromAccount = $result->fromAccountNumber ?? '?';
-            $toAccount = $result->toAccountNumber ?? '?';
-            $amount = $result->amount?->toDecimalString() ?? '?';
-
-            $line = sprintf("  %s: %s -> %s, transferred %s", $statusString, $fromAccount, $toAccount, $amount);
-
-            if ($result->reason !== null) {
-                $line .= " ({$result->reason})";
-            }
-
-            $lines[] = $line;
+            $lines[] = $this->formatTransferResult($result);
 
             if ($result->status->isAccepted()) {
                 $appliedCount++;
@@ -56,4 +44,19 @@ final class Reporter
         return implode(PHP_EOL, $lines);
     }
 
+    private function formatTransferResult(TransferResult $result): string
+    {
+        $statusString = strtoupper($result->status?->value);
+        $fromAccount = $result->fromAccountNumber ?? '?';
+        $toAccount = $result->toAccountNumber ?? '?';
+        $amount = $result->amount?->toDecimalString() ?? '?';
+
+        $line = sprintf("  %s: %s -> %s : %s", $statusString, $fromAccount, $toAccount, $amount);
+
+        if ($result->reason !== null) {
+            $line .= " ({$result->reason})";
+        }
+
+        return $line;
+    }
 }
