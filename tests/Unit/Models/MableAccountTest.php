@@ -10,6 +10,21 @@ function createMableAccount(string $accountNumber, string $balance): MableAccoun
     return new MableAccount($accountNumber, Money::fromDecimalString($balance));
 }
 
+describe('validateAccountNumber', function (): void {
+    it('accepts a 16-digit account number', function (): void {
+        MableAccount::validateAccountNumber('1111234522226789');
+    })->throwsNoExceptions();
+
+    it('rejects an invalid account number', function (string $invalidAccountNumber): void {
+        MableAccount::validateAccountNumber($invalidAccountNumber);
+    })->with([
+        'too short' => ['12345'],
+        'too long' => ['11112345222267891'],
+        'non-numeric' => ['abcd234522226789'],
+        'empty string' => [''],
+    ])->throws(InvalidArgumentException::class);
+});
+
 describe('getBalance', function (): void {
     it('returns the balance the account was constructed with', function (): void {
         $accountNumber = '1111234522226789';

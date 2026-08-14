@@ -5,8 +5,10 @@ declare(strict_types=1);
 
 require __DIR__.'/vendor/autoload.php';
 
+use App\Models\MableAccount;
 use App\Services\AccountBalanceLoader;
 use App\Services\CsvFileReader;
+use App\Services\TransferProcessor;
 
 if (PHP_VERSION_ID < 80400) {
     fwrite(STDERR, "Requires PHP 8.4 or newer, got: " . PHP_VERSION . PHP_EOL);
@@ -24,11 +26,19 @@ if ($balancesFilePath === null || $transfersFilePath === null) {
 echo "Balances file: {$balancesFilePath}" . PHP_EOL;
 echo "Transfers file: {$transfersFilePath}" . PHP_EOL;
 
-$loadResult = new AccountBalanceLoader(new CsvFileReader())->load($balancesFilePath);
+$csvFileReader = new CsvFileReader();
+
+$loadResult = new AccountBalanceLoader($csvFileReader)->load($balancesFilePath);
 echo count($loadResult->accounts) . " accounts loaded successfully." . PHP_EOL;
 foreach ($loadResult->errors as $error) {
     echo "    - $error" . PHP_EOL;
 }
+
+$transferResults = new TransferProcessor(
+        $csvFileReader, 
+        MableAccount::class
+    )->process($transfersFilePath, $loadResult->accounts);
+// @TODO: output;
 
 echo "All done." . PHP_EOL;
 exit(0);
