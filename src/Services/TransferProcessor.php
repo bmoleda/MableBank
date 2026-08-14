@@ -8,13 +8,16 @@ use App\Dtos\TransferResult;
 use App\Enums\TransferStatus;
 use App\Services\CsvFileReader;
 use App\Models\BaseAccount;
-use App\Models\MableAccount;
 use App\Models\Money;
 
 final class TransferProcessor
 {
+    /**
+     * @param class-string<BaseAccount> $accountClass
+     */
     public function __construct(
         private readonly CsvFileReader $csvFileReader,
+        private readonly string $accountClass,
     ) {
     }
 
@@ -52,8 +55,8 @@ final class TransferProcessor
 
         [$fromAccountNumber, $toAccountNumber, $amount] = $row;
 
-        MableAccount::validateAccountNumber($fromAccountNumber);
-        MableAccount::validateAccountNumber($toAccountNumber);
+        ($this->accountClass)::validateAccountNumber($fromAccountNumber);
+        ($this->accountClass)::validateAccountNumber($toAccountNumber);
 
         return [$fromAccountNumber, $toAccountNumber, Money::fromDecimalString($amount)];
     }
