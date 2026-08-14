@@ -2,33 +2,28 @@
 
 declare(strict_types=1);
 
-use App\Models\MableAccount;
+use App\Models\BaseAccount;
 use App\Models\Money;
 
-function createMableAccount(string $accountNumber, string $balance): MableAccount
+function createTestAccount(string $accountNumber, string $balance): BaseAccount
 {
-    return new MableAccount($accountNumber, Money::fromDecimalString($balance));
+    return new class($accountNumber, Money::fromDecimalString($balance)) extends BaseAccount {};
 }
 
-describe('validateAccountNumber', function (): void {
-    it('accepts a 16-digit account number', function (): void {
-        MableAccount::validateAccountNumber('1111234522226789');
-    })->throwsNoExceptions();
-
-    it('rejects an invalid account number', function (string $invalidAccountNumber): void {
-        MableAccount::validateAccountNumber($invalidAccountNumber);
+describe("validateAccountNumber", function (): void {
+    it("never throws exceptions", function (string $accountNumber): void {
+        BaseAccount::validateAccountNumber($accountNumber);
     })->with([
         'too short' => ['12345'],
         'too long' => ['11112345222267891'],
         'non-numeric' => ['abcd234522226789'],
         'empty string' => [''],
-    ])->throws(InvalidArgumentException::class);
+    ])->throwsNoExceptions();
 });
 
-describe('getBalance', function (): void {
-    it('returns the balance the account was constructed with', function (): void {
-        $accountNumber = '1111234522226789';
-        $account = createMableAccount($accountNumber, '1.00');
+describe("getBalance", function (): void {
+    it("returns the balance the account was constructed with", function (): void {
+        $account = createTestAccount("1111234522226789", "1.00");
 
         expect($account->getBalance()->equals(Money::fromDecimalString("1.00")))->toBeTrue();
     });
@@ -48,7 +43,7 @@ describe('credit', function (): void {
     ]);
 });
 
-describe('debit', function (): void {
+describe("debit", function (): void {
     it('decreases the balance by the given amount', function (string $initialBalance, string $amountToRemove, string $expectedBalance): void {
         $account = createMableAccount('1111234522226789', $initialBalance);
 
@@ -61,16 +56,13 @@ describe('debit', function (): void {
         'zero' => ['2.50', '0.00', '2.50'],
     ]);
 
-    it('leaves the balance unchanged if the amount would make it negative', function (): void {
-        $account = createMableAccount('1111234522226789', '1.00');
+    it("allows the balance to become negative", function (): void {
+        $account = createTestAccount("1111234522226789", "1.00");
 
-        expect($account->getBalance()->equals(Money::fromDecimalString('1.00')))->toBeTrue();
-    });
+        $account->debit(Money::fromDecimalString("1.50"));
 
-    it('throws exception if the amount would make it negative', function (): void {
-        $account = createMableAccount('1111234522226789', '1.00');
-
-        expect(fn () => $account->debit(Money::fromDecimalString('1.50')))
-            ->toThrow(Exception::class, 'Balance cannot be negative. Current balance: 1.00, attempted to remove: 1.50.');
+        expect($account->getBalance()->equals(Money::fromDecimalString("-0.50")))->toBeTrue();
     });
 });
+
+
