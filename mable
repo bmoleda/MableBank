@@ -6,6 +6,7 @@ declare(strict_types=1);
 require __DIR__.'/vendor/autoload.php';
 
 use App\Helpers\CsvFileReader;
+use App\Helpers\Reporter;
 use App\Models\MableAccount;
 use App\Services\AccountBalanceLoader;
 use App\Services\TransferProcessor;
@@ -23,16 +24,12 @@ if ($balancesFilePath === null || $transfersFilePath === null) {
     exit(1);
 }
 
-echo "Balances file: {$balancesFilePath}" . PHP_EOL;
-echo "Transfers file: {$transfersFilePath}" . PHP_EOL;
-
 $csvFileReader = new CsvFileReader();
+$reporter = new Reporter();
 
 $loadResult = new AccountBalanceLoader($csvFileReader)->load($balancesFilePath);
-echo count($loadResult->accounts) . " accounts loaded successfully." . PHP_EOL;
-foreach ($loadResult->errors as $error) {
-    echo "    - $error" . PHP_EOL;
-}
+echo $reporter->reportBalanceLoad($balancesFilePath, $loadResult) . PHP_EOL;
+
 
 $transferResults = new TransferProcessor(
         $csvFileReader, 
