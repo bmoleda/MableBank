@@ -9,12 +9,16 @@ use App\Models\MableAccount;
 
 final class AccountBalanceLoader
 {
+    public function __construct(
+        private readonly CsvFileReader $csvFileReader,
+    ) {
+    }
     public function load(string $path): BalanceLoadResult
     {
         $accounts = [];
         $errors = [];
 
-        foreach ($this->readCsvFile($path) as $lineNumber => $row) {
+        foreach ($this->csvFileReader->read($path) as $lineNumber => $row) {
             try {
                 [$accountNumber, $balance] = $this->parseRow($row);
             } catch (\InvalidArgumentException $exception) {
@@ -42,35 +46,5 @@ final class AccountBalanceLoader
         }
 
         return $row;
-    }
-
-    /**
-     * @return \Generator<int, list<string>>
-     */
-    private function readCsvFile(string $path): \Generator
-    {
-        if (! is_file($path) || ! is_readable($path)) {
-            throw new \RuntimeException("Unable to open file '{$path}'.");
-        }
-
-        $handle = fopen($path, 'rb');
-
-        if ($handle === false) {
-            throw new \RuntimeException("Unable to open file '{$path}'.");
-        }
-
-        try {
-            while (($row = fgetcsv($handle, escape: '')) !== false) {
-                $trimmedRow = array_map(static fn (?string $value): string => trim($value ?? ''), $row);
-
-                if ($trimmedRow === ['']) {
-                    continue;
-                }
-
-                yield $trimmedRow;
-            }
-        } finally {
-            fclose($handle);
-        }
     }
 }
