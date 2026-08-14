@@ -20,7 +20,7 @@ $balancesFilePath = $argv[1] ?? null;
 $transfersFilePath = $argv[2] ?? null;
 
 if ($balancesFilePath === null || $transfersFilePath === null) {
-    fwrite(STDERR, "Usage: ./" . PATHINFO_FILENAME . " <balances.csv> <transfers.csv>" . PHP_EOL);
+    fwrite(STDERR, "Usage: ./mable <balances.csv> <transfers.csv>" . PHP_EOL);
     exit(1);
 }
 

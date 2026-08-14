@@ -11,7 +11,7 @@ PHP 8.4 and Composer installed in your system.
 ```sh
 git clone git@github.com:bmoleda/MableBank.git MableBank
 cd MableBank
-composer -i
+composer install
 ```
 
 ## Try it out
