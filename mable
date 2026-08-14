@@ -30,12 +30,11 @@ $reporter = new Reporter();
 $loadResult = new AccountBalanceLoader($csvFileReader)->load($balancesFilePath);
 echo $reporter->reportBalanceLoad($balancesFilePath, $loadResult) . PHP_EOL;
 
-
 $transferResults = new TransferProcessor(
         $csvFileReader, 
         MableAccount::class
     )->process($transfersFilePath, $loadResult->accounts);
-// @TODO: output;
+echo $reporter->reportTransfers($transfersFilePath, $transferResults) . PHP_EOL;
 
 echo "All done." . PHP_EOL;
 exit(0);

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Helpers;
 
 use App\Dtos\BalanceLoadResult;
+use App\Dtos\TransferResult;
+use App\Enums\TransferStatus;
 
 final class Reporter
 {
@@ -18,4 +20,40 @@ final class Reporter
 
         return implode(PHP_EOL, $lines);
     }
+
+    /**
+     * @param list<TransferResult> $results
+     */
+    public function reportTransfers(string $path, array $results): string
+    {
+        $lines = ["Processed transfers from {$path}:"];
+        $appliedCount = 0;
+        $rejectedCount = 0;
+
+        foreach ($results as $result) {
+            $statusString = strtoupper($result->status?->value);
+            $fromAccount = $result->fromAccountNumber ?? '?';
+            $toAccount = $result->toAccountNumber ?? '?';
+            $amount = $result->amount?->toDecimalString() ?? '?';
+
+            $line = sprintf("  %s: %s -> %s, transferred %s", $statusString, $fromAccount, $toAccount, $amount);
+
+            if ($result->reason !== null) {
+                $line .= " ({$result->reason})";
+            }
+
+            $lines[] = $line;
+
+            if ($result->status->isAccepted()) {
+                $appliedCount++;
+            } else {
+                $rejectedCount++;
+            }
+        }
+
+        $lines[] = sprintf("Summary: %d applied, %d rejected.", $appliedCount, $rejectedCount);
+
+        return implode(PHP_EOL, $lines);
+    }
+
 }
