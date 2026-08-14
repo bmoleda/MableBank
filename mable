@@ -5,5 +5,26 @@ declare(strict_types=1);
 
 require __DIR__.'/vendor/autoload.php';
 
-echo "Simple money transfer processor for simple establishments." . PHP_EOL;
+use App\Services\AccountBalanceLoader;
+
+if (PHP_VERSION_ID < 80400) {
+    fwrite(STDERR, "Requires PHP 8.4 or newer, got: " . PHP_VERSION . PHP_EOL);
+    exit(1);
+}
+
+$balancesFilePath = $argv[1] ?? null;
+$transfersFilePath = $argv[2] ?? null;
+
+if ($balancesFilePath === null || $transfersFilePath === null) {
+    fwrite(STDERR, "Usage: ./" . PATHINFO_FILENAME . " <balances.csv> <transfers.csv>" . PHP_EOL);
+    exit(1);
+}
+
+echo "Balances file: {$balancesFilePath}" . PHP_EOL;
+echo "Transfers file: {$transfersFilePath}" . PHP_EOL;
+
+$loadResult = new AccountBalanceLoader()->load($balancesFilePath);
+echo count($loadResult->accounts) . " accounts loaded successfully." . PHP_EOL;
+
+echo "All done." . PHP_EOL;
 exit(0);
